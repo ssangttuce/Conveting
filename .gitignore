@@ -1,0 +1,24 @@
+conveting/
+*.pyc
+__pycache__/
+
+# Python bytecode
+*.pyc
+*.pyo
+__pycache__/
+
+# Django specific
+*.sqlite3
+db.sqlite3
+
+# Virtual environment
+venv/
+.env/
+
+# Environment variable files
+.python-version
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
