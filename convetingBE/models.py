@@ -1,22 +1,26 @@
 from django.db import models
 
-class Pet(models.Model):
-    name = models.CharField(max_length=100)
-    age = models.IntegerField()
-    weight = models.FloatField()
-    breed = models.CharField(max_length=100)
-    gender = models.CharField(max_length=10)
-    neutered = models.BooleanField(default=False)
-    allergies = models.CharField(max_length=255, blank=True, null=True)
+class Pets(models.Model):
+    owner = models.CharField(max_length=30, primary_key=True)
+    name = models.CharField(max_length=15, primary_key=True)
+    
+class Disease(models.Model):
+    disease = models.CharField(max_length=255, primary_key=True)
+    symptom = models.TextField(max_length=500)
 
-class DiagnosisSubmission(models.Model):
-    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
-    diagnosis_area = models.CharField(max_length=50, choices=[('eye', 'Eye'), ('skin', 'Skin')])
-    photo = models.ImageField(upload_to='diagnosis_photos/')
-    submission_date = models.DateTimeField(auto_now_add=True)
+class ResultAI(models.Model):
+    seq = models.PositiveIntegerField(primary_key=True)
+    predicted_disease1 = models.DecimalField(max_digits=5, decimal_places=2)
+    predicted_disease2 = models.DecimalField(max_digits=5, decimal_places=2)
+    predicted_disease3 = models.DecimalField(max_digits=5, decimal_places=2)
 
-class DiagnosisResult(models.Model):
-    submission = models.OneToOneField(DiagnosisSubmission, on_delete=models.CASCADE)
-    predicted_disease = models.CharField(max_length=100)
-    description = models.TextField()
-    result_date = models.DateTimeField(auto_now_add=True)
+class Diagnosis(models.Model):
+    owner = models.ForeignKey(Pets, on_delete=models.CASCADE)
+    pet = models.ForeignKey(Pets, on_delete=models.CASCADE)
+    seq = models.ForeignKey(ResultAI, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(auto_now_add=True)
+    photo = models.CharField(max_length=255)
+
+class Prediction(models.Model):
+    seq = models.ForeignKey(ResultAI, on_delete=models.CASCADE, primary_key=True)
+    disease = models.ForeignKey(Disease, on_delete=models.DO_NOTHING, primary_key=True)
