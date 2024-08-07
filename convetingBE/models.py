@@ -1,15 +1,16 @@
 from django.db import models
 
-class Pets(models.Model):
-    owner = models.CharField(max_length=30, primary_key=True)
-    name = models.CharField(max_length=20, primary_key=True)
+class SymptomDescription(models.Model):
+    seq = models.PositiveIntegerField()
+    owner = models.CharField(max_length=30)
+    pet = models.CharField(max_length=20)
+    photo = models.CharField(max_length=255)
     
-class Disease(models.Model):
-    disease = models.CharField(max_length=255, primary_key=True)
-    symptom = models.TextField(max_length=500)
+    class Meta:
+        unique_together = ('seq', 'owner', 'pet')
 
-class ResultAI(models.Model):
-    seq = models.PositiveIntegerField(primary_key=True)
+class Prediction(models.Model):
+    seq = models.ForeignKey(SymptomDescription, on_delete=models.CASCADE)
     skin1 = models.DecimalField(max_digits=5, decimal_places=2)
     skin2 = models.DecimalField(max_digits=5, decimal_places=2)
     skin3 = models.DecimalField(max_digits=5, decimal_places=2)
@@ -29,14 +30,13 @@ class ResultAI(models.Model):
     eye10 = models.DecimalField(max_digits=5, decimal_places=2)
     eye11 = models.DecimalField(max_digits=5, decimal_places=2)
     
+class Disease(models.Model):
+    disease = models.CharField(max_length=255, primary_key=True)
+    symptom = models.TextField(max_length=500)
 
 class Diagnosis(models.Model):
-    owner = models.ForeignKey(Pets, on_delete=models.CASCADE, primary_key=True)
-    pet = models.ForeignKey(Pets, on_delete=models.CASCADE, primary_key=True)
-    seq = models.ForeignKey(ResultAI, on_delete=models.CASCADE, primary_key=True)
-    datetime = models.DateTimeField(auto_now_add=True)
-    photo = models.CharField(max_length=255)
-
-class Prediction(models.Model):
-    seq = models.ForeignKey(ResultAI, on_delete=models.CASCADE, primary_key=True)
-    disease = models.ForeignKey(Disease, on_delete=models.DO_NOTHING, primary_key=True)
+    seq = models.ForeignKey(SymptomDescription, on_delete=models.CASCADE)
+    disease = models.ForeignKey(Disease, on_delete=models.DO_NOTHING)
+    
+    class Meta:
+        unique_together = ('seq', 'disease')

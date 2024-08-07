@@ -1,8 +1,13 @@
-from django.urls import path
-from .views import DiagnosisSubmitListCreateView, DiagnosisResultRetrieveView, DiagnosisHistoryListCreateView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import SymptomDescriptionViewSet, PredictionViewSet, DiseaseViewSet, DiagnosisViewSet
+
+router = DefaultRouter()
+router.register('symptoms', SymptomDescriptionViewSet)
+router.register('predictions', PredictionViewSet)
+router.register('diseases', DiseaseViewSet)
+router.register('diagnoses', DiagnosisViewSet)
 
 urlpatterns = [
-    path('diagnosis/Submit/', DiagnosisSubmitListCreateView.as_view(), name='diagnosis_submit'),
-    path('diagnosis/result/<int:submit_id>/', DiagnosisResultRetrieveView.as_view(), name='diagnosis_result'),
-    path('diagnosis/history/', DiagnosisHistoryListCreateView.as_view(), name='diagnosis_history'),
+    path('', include(router.urls)),
 ]

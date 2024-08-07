@@ -1,17 +1,22 @@
 from rest_framework import serializers
-from .models import Pet, DiagnosisSubmit, DiagnosisResult
+from .models import SymptomDescription, Prediction, Disease, Diagnosis
 
-class PetSerializer(serializers.ModelSerializer):
+class SymptomDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Pet
+        model = SymptomDescription
         fields = '__all__'
 
-class DiagnosisSubmitSerializer(serializers.ModelSerializer):
+class PredictionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DiagnosisSubmit
+        model = Prediction
         fields = '__all__'
 
-class DiagnosisResultSerializer(serializers.ModelSerializer):
+class DiseaseSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DiagnosisResult
+        model = Disease
+        fields = '__all__'
+
+class DiagnosisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Diagnosis
         fields = '__all__'

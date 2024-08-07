@@ -1,16 +1,19 @@
-# from rest_framework import generics
-# from .models import DiagnosisSubmit, DiagnosisResult
-# from .serializers import DiagnosisSubmitSerializer, DiagnosisResultSerializer
+from rest_framework import viewsets
+from .models import SymptomDescription, Prediction, Disease, Diagnosis
+from .serializers import SymptomDescriptionSerializer, PredictionSerializer, DiseaseSerializer, DiagnosisSerializer
 
-# class DiagnosisSubmitListCreateView(generics.ListCreateAPIView):
-#     queryset = DiagnosisSubmit.objects.all()
-#     serializer_class = DiagnosisSubmitSerializer
+class SymptomDescriptionViewSet(viewsets.ModelViewSet):
+    queryset = SymptomDescription.objects.all()
+    serializer_class = SymptomDescriptionSerializer
 
-# class DiagnosisResultRetrieveView(generics.RetrieveAPIView):
-#     queryset = DiagnosisResult.objects.all()
-#     serializer_class = DiagnosisResultSerializer
-#     lookup_field = 'submit_id'
+class PredictionViewSet(viewsets.ModelViewSet):
+    queryset = Prediction.objects.all()
+    serializer_class = PredictionSerializer
 
-# class DiagnosisHistoryListCreateView(generics.ListCreateAPIView):
-#     queryset = DiagnosisResult.objects.all()
-#     serializer_class = DiagnosisResultSerializer
+class DiseaseViewSet(viewsets.ModelViewSet):
+    queryset = Disease.objects.all()
+    serializer_class = DiseaseSerializer
+
+class DiagnosisViewSet(viewsets.ModelViewSet):
+    queryset = Diagnosis.objects.all()
+    serializer_class = DiagnosisSerializer
