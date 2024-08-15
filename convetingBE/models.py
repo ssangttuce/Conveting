@@ -43,7 +43,7 @@ class Disease(models.Model):
 class Diagnosis(models.Model):
     seq = models.ForeignKey(SymptomDescription, on_delete=models.CASCADE, db_column='seq')
     disease = models.ForeignKey(Disease, on_delete=models.DO_NOTHING, db_column='disease')
-    
+
     class Meta:
         db_table = 'diagnosis'
         unique_together = ('seq', 'disease')
