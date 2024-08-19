@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
 from django.db import models
-from .models import SymptomDescription, Disease, Diagnosis
+from .models import Prediction, Diagnosis, Disease, SymptomDescription
 from .serializers import SymptomDescriptionSerializer, DiseaseSerializer, DiagnosisSerializer
 from .utils import run_diagnosis  # 예측 함수를 임포트
 
@@ -71,10 +71,46 @@ class SymptomDescriptionViewSet(APIView):
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 예측 결과 반환
+        # Prediction 모델에 예측 결과 저장
+        prediction = Prediction.objects.create(
+            seq=symptom_description,
+            skin1=prediction_results.get('구진, 플라크', 0),
+            skin2=prediction_results.get('비듬, 각질, 상피성잔고리', 0),
+            skin3=prediction_results.get('태선화, 과다색소침착', 0),
+            skin4=prediction_results.get('농포, 여드름', 0),
+            skin5=prediction_results.get('미란, 궤양', 0),
+            skin6=prediction_results.get('결절, 종괴', 0),
+            eye1=prediction_results.get('결막염', 0),
+            eye2=prediction_results.get('궤양성 각막질환', 0),
+            eye3=prediction_results.get('백내장', 0),
+            eye4=prediction_results.get('비궤양성 각막질환', 0),
+            eye5=prediction_results.get('색소침착성각막염', 0),
+            eye6=prediction_results.get('안검 내반증', 0),
+            eye7=prediction_results.get('안검종양', 0),
+            eye8=prediction_results.get('유루증', 0),
+        )
+
+        # 30% 이상 확률의 질환을 Diagnosis 테이블에 저장
+        for disease, probability in prediction_results.items():
+            if probability >= 30.0:
+                disease_instance, _ = Disease.objects.get_or_create(disease=disease)
+                Diagnosis.objects.create(seq=symptom_description, disease=disease_instance)
+
+        # Diagnosis 테이블과 Disease 테이블 조인하여 결과 반환
+        diagnoses = Diagnosis.objects.filter(seq=symptom_description).select_related('disease')
+
+        response_data = []
+        for diagnosis in diagnoses:
+            disease = diagnosis.disease
+            response_data.append({
+                "disease": disease.disease,
+                "symptom": disease.symptom
+            })
+
         return Response({
-            "message": "예측이 성공적으로 완료되었습니다.",
-            "predictions": prediction_results
+            "message": "예측이 성공적으로 완료되었고 결과가 저장되었습니다.",
+            "predictions": prediction_results,
+            "diagnoses": response_data
         }, status=status.HTTP_200_OK)
 
 class DiseaseViewSet(viewsets.ModelViewSet):
