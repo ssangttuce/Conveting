@@ -4,6 +4,7 @@ from keras.models import load_model
 from keras.preprocessing.image import load_img, img_to_array
 
 
+
 model_path = './ai_weights'
 
 # 안구 질환별 모델 파일 경로
