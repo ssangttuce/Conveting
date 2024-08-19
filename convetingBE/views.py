@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db import models
 from .models import SymptomDescription, Disease, Diagnosis
 from .serializers import SymptomDescriptionSerializer, DiseaseSerializer, DiagnosisSerializer
+from .utils import run_diagnosis  # 예측 함수를 임포트
 
 class DiagnosisHistoryView(APIView):
     def get(self, request, user_id):
@@ -25,13 +26,13 @@ class DiagnosisHistoryView(APIView):
         except SymptomDescription.DoesNotExist:
             return Response({"error": "No history found for this user."}, status=status.HTTP_404_NOT_FOUND)
 
-
 class SymptomDescriptionViewSet(APIView):
     def post(self, request, *args, **kwargs):
         # 요청 데이터에서 owner, pet, photo 정보 가져오기
         owner = request.data.get('owner')
         pet = request.data.get('pet')
         photo = request.FILES.get('photo')  # 파일은 FILES에서 가져옵니다
+        part = request.data.get('part')  # 진단 부위 ('eye' 또는 'skin')
 
         if not owner or not pet or not photo:
             return Response({"error": "owner, pet, and photo are required fields."}, status=status.HTTP_400_BAD_REQUEST)
@@ -64,16 +65,17 @@ class SymptomDescriptionViewSet(APIView):
 
         # AI 모델에 사진 경로를 전달하고 진단을 수행
         # 예시: AI 모델 호출 (여기서는 가상의 함수로 표시)
-        # diagnosis_result = call_ai_model(photo_path)
-        
-        # 실제 AI 모델 호출 코드는 위 주석 부분에 추가하면 됩니다.
+        # 모델 예측 수행
+        try:
+            prediction_results = run_diagnosis(photo_path, part)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 응답 반환
+        # 예측 결과 반환
         return Response({
-            "message": "질환 명세가 저장되었고 AI 진단이 실행되었습니다.",
-            "symptom_id": symptom_description.seq  # seq는 PK로 가정
-            # "diagnosis_result": diagnosis_result  # AI 모델 결과 포함 가능
-        }, status=status.HTTP_201_CREATED)
+            "message": "예측이 성공적으로 완료되었습니다.",
+            "predictions": prediction_results
+        }, status=status.HTTP_200_OK)
 
 class DiseaseViewSet(viewsets.ModelViewSet):
     queryset = Disease.objects.all()
