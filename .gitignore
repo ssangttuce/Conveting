@@ -24,3 +24,5 @@ venv/
 *.swp
 
 populate_data.py
+
+ai_weights
