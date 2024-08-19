@@ -89,29 +89,28 @@ class SymptomDescriptionViewSet(APIView):
             eye7=prediction_results.get('안검종양', 0),
             eye8=prediction_results.get('유루증', 0),
         )
+        # 상위 2개의 확률이 높은 질환을 선택
+        top_diseases = sorted(prediction_results.items(), key=lambda x: x[1], reverse=True)[:2]
 
-        # 30% 이상 확률의 질환을 Diagnosis 테이블에 저장
-        for disease, probability in prediction_results.items():
-            if probability >= 30.0:
+        # 30% 이상 확률의 질환을 Diagnosis 테이블에 저장하고, 상위 2개의 질환을 반환
+        response_data = []
+        for disease, probability in top_diseases:
+            if probability > 0:  # 확률이 0% 이상인 경우에만 처리
                 disease_instance, _ = Disease.objects.get_or_create(disease=disease)
                 Diagnosis.objects.create(seq=symptom_description, disease=disease_instance)
-
-        # Diagnosis 테이블과 Disease 테이블 조인하여 결과 반환
-        diagnoses = Diagnosis.objects.filter(seq=symptom_description).select_related('disease')
-
-        response_data = []
-        for diagnosis in diagnoses:
-            disease = diagnosis.disease
-            response_data.append({
-                "disease": disease.disease,
-                "symptom": disease.symptom
-            })
+                response_data.append({
+                    "disease": disease_instance.disease,
+                    "symptom": disease_instance.symptom,
+                    "cure": disease_instance.cure,
+                    "probability": probability  # 확률 추가
+                })
 
         return Response({
             "message": "예측이 성공적으로 완료되었고 결과가 저장되었습니다.",
             "predictions": prediction_results,
-            "diagnoses": response_data
+            "diagnoses": response_data  # 상위 2개의 질환과 확률 정보 포함
         }, status=status.HTTP_200_OK)
+
 
 class DiseaseViewSet(viewsets.ModelViewSet):
     queryset = Disease.objects.all()
