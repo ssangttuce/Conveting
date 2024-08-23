@@ -9,6 +9,6 @@ router = DefaultRouter()
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('diagnosis/history/<str:user_id>/', DiagnosisHistoryView.as_view(), name='diagnosis-history'),  # 추가된 라우팅
+    path('diagnosis/history/', DiagnosisHistoryView.as_view(), name='diagnosis-history'),  # 추가된 라우팅
     path('diagnosis/description/', SymptomDescriptionViewSet.as_view(), name='symptom-description')
 ]

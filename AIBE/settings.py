@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     # "django.contrib.sessions",
     # "django.contrib.messages",
     # "django.contrib.staticfiles",
+    'corsheaders',
     'rest_framework',
     "convetingBE"
 ]
@@ -60,7 +61,11 @@ MIDDLEWARE = [
     # "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'corsheaders.middleware.CorsMiddleware'
 ]
+
+# 모든 도메인에서 접근 허용 (개발 환경에서만 사용)
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "AIBE.urls"
 
