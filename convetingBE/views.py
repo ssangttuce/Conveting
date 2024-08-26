@@ -81,6 +81,7 @@ class SymptomDescriptionViewSet(APIView):
             seq=new_seq,  # 생성한 seq 번호를 저장
             owner=owner,
             pet=pet,
+            part=part,
             photo=photo_path
         )
 

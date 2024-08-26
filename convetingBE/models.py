@@ -4,7 +4,7 @@ class SymptomDescription(models.Model):
     seq = models.PositiveIntegerField(primary_key=True, db_column='seq')
     owner = models.CharField(max_length=30)
     pet = models.CharField(max_length=20)
-    part = models.CharField(max_length=20, default='skin')
+    part = models.CharField(max_length=20)
     photo = models.CharField(max_length=255)
     
     class Meta:
