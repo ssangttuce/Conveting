@@ -37,7 +37,8 @@ class DiagnosisHistoryView(APIView):
                         "cure": disease_instance.cure,
                         "photo": symptom.photo,  # 각 진단 내역에 대해 사진 경로도 추가
                         "part": symptom.part,  # 각 진단 내역에 대해 부위도 추가
-                        "pet": symptom.pet
+                        "pet": symptom.pet,
+                        "seq": symptom.seq
                     })
             
             # 결과 반환
