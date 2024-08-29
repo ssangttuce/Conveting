@@ -1,0 +1,25 @@
+{% extends 'base.html' %} {% block title %}AI Diagnosis{% endblock %} {% block
+content %}
+
+<h2>AI Diagnosis Form</h2>
+<form
+    action="{% url 'diagnosis_form' %}"
+    method="POST"
+    enctype="multipart/form-data"
+>
+    {% csrf_token %}
+    <label for="pet">Pet Name:</label>
+    <input type="text" id="pet" name="pet" required />
+
+    <label for="part">Diagnosis Part:</label>
+    <select id="part" name="part">
+        <option value="eye">Eye</option>
+        <option value="skin">Skin</option>
+    </select>
+
+    <label for="photo">Upload Photo:</label>
+    <input type="file" id="photo" name="photo" required />
+
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}

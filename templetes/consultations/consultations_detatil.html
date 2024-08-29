@@ -1,0 +1,21 @@
+{% extends 'base.html' %} {% block title %}Consultation Detail{% endblock %} {%
+block content %}
+<h2>Consultation with Dr. {{ consultation.vet_name }}</h2>
+<p>Date: {{ consultation.date }}</p>
+<p>Pet: {{ consultation.pet_name }}</p>
+<p>Symptoms: {{ consultation.symptoms }}</p>
+
+<h3>Video Consultation</h3>
+<p><a href="#">Join Video Call</a></p>
+
+{% if consultation.review %}
+<h3>Your Review</h3>
+<p>{{ consultation.review }}</p>
+{% else %}
+<h3>Leave a Review</h3>
+<form action="{% url 'submit_review' consultation.id %}" method="POST">
+    {% csrf_token %}
+    <textarea name="review" rows="4" cols="50"></textarea>
+    <button type="submit">Submit Review</button>
+</form>
+{% endif %} {% endblock %}

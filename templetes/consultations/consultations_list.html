@@ -1,0 +1,15 @@
+{% extends 'base.html' %} {% block title %}Consultations{% endblock %} {% block
+content %}
+<h2>Your Consultations</h2>
+<ul>
+    {% for consultation in consultations %}
+    <li>
+        <a href="{% url 'consultation_detail' consultation.id %}">
+            Consultation with Dr. {{ consultation.vet_name }} on {{
+            consultation.date }}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'book_consultation' %}">Book a New Consultation</a>
+{% endblock %}
