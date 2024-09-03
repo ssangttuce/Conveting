@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Diagnosis Results{% endblock %}
+{% block content %}
+    <h2>Diagnosis Results</h2>
+    {% for result in results %}
+        <li>
+            <strong>Disease:</strong> {{ result.disease }}
+            <br>
+            <strong>Symptom:</strong> {{ result.symptom }}
+            <br>
+            <strong>Cure:</strong> {{ result.cure }}
+            <br>
+            <strong>Probability:</strong> {{ result.probability }}
+            <br>
+        </li>
+        <br>
+        <br>
+    {% endfor %}
+{% endblock %}

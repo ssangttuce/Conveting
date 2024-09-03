@@ -6,6 +6,8 @@
           method="post"
           enctype="multipart/form-data">
         {% csrf_token %}
+        <label for="owner">Name:</label>
+        <input type="text" id="owner" name="owner" required />
         <label for="pet">Pet Name:</label>
         <input type="text" id="pet" name="pet" required />
         <label for="part">Diagnosis Part:</label>
@@ -35,7 +37,7 @@
             reader.onload = function(){
                 var output = document.getElementById('preview');
                 output.src = reader.result;
-                <!-- output.style.display = 'block'; -->
+                output.style.display = 'block';
             };
             reader.readAsDataURL(event.target.files[0]);
         }

@@ -141,7 +141,9 @@ class DiagnosisView(APIView):
                     "probability": probability  # 확률 추가
                 })
 
-        return render(request=request, template_name="../templates/diagnosis_result.html", context=response_data)
+        cont = {"results": response_data}
+        print("###CONTEXT###", cont)
+        return render(request=request, template_name=os.path.join(TEMPLATE_ROOT, 'diagnosis/diagnosis_result.html'), context=cont)
 
         # return Response({
         #     "message": "예측이 성공적으로 완료되었고 결과가 저장되었습니다.",
