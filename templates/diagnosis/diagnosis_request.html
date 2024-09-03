@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}AI Diagnosis{% endblock %}
+{% block content %}
+    <h2>AI Diagnosis Form</h2>
+    <form action="{% url 'diagnosis' %}"
+          method="post"
+          enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="pet">Pet Name:</label>
+        <input type="text" id="pet" name="pet" required />
+        <label for="part">Diagnosis Part:</label>
+        <select id="part" name="part">
+            <option value="eye">Eye</option>
+            <option value="skin">Skin</option>
+        </select>
+        <label for="photo">Upload Photo:</label>
+        <input type="file"
+               id="photo"
+               name="photo"
+               required
+               onchange="previewImage(event)" />
+        <img id="preview"
+             height="500px"
+             width="500px"
+             src=""
+             alt="Image preview"
+             style="display:none;
+                    max-width: 300px;
+                    margin-top: 10px" />
+        <button type="submit">Submit</button>
+    </form>
+    <script>
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function(){
+                var output = document.getElementById('preview');
+                output.src = reader.result;
+                <!-- output.style.display = 'block'; -->
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+{% endblock content %}

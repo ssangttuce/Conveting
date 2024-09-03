@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}
+    Home
+{% endblock title %}
+{% block content %}
+    <h1>Welcome to Conveting!</h1>
+    <p>Your trusted AI-powered pet diagnosis service.</p>
+    <div class="features">
+        <div>
+            <h2>AI Diagnosis</h2>
+            <p>Get an instant diagnosis for your pet's symptoms using our AI.</p>
+            <a href="{% url 'diagnosis' %}">Start Diagnosis</a>
+        </div>
+        <div>
+            <h2>Consult a Vet</h2>
+            <p>Schedule a video consultation with a qualified veterinarian.</p>
+            {% comment %} <a href="{% url 'consultation_list' %}">Book a Consultation</a> {% endcomment %}
+        </div>
+    </div>
+{% endblock content %}

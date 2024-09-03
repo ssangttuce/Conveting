@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="description" />
+        <meta name="keywords" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            {% block title %}
+                AIBE
+            {% endblock title %}
+        </title>
+        {% comment %} <link rel="stylesheet" href="{% static 'css/style.css' %}" /> {% endcomment %}
+    </head>
+    <body>
+        <header>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li>
+                        {% comment %} <a href="{% url 'diagnosis_form' %}">AI Diagnosis</a> {% endcomment %}
+                    </li>
+                    <li>
+                        {% comment %} <a href="{% url 'consultation_list' %}">Consultations</a> {% endcomment %}
+                    </li>
+                    <li>
+                        <a href="#">Profile</a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            {% block content %}
+            {% endblock content %}
+        </main>
+        <footer>
+            <p>2024 AIBE. All Rights Reserved.</p>
+        </footer>
+    </body>
+</html>

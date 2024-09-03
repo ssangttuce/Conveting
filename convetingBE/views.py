@@ -1,13 +1,22 @@
 import os
-from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from django.shortcuts import render
+from rest_framework import status 
 from django.conf import settings
 from django.db import models
 from .models import Prediction, Diagnosis, Disease, SymptomDescription
 from .serializers import SymptomDescriptionSerializer, DiseaseSerializer, DiagnosisSerializer
 from .utils import run_diagnosis  # 예측 함수를 임포트
+from django.shortcuts import render
+from pathlib import Path
+import os
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+TEMPLATE_ROOT = os.path.join(BASE_DIR, 'templates')
+
+def home(request):
+    return render(request, '../templates/home.html')
 
 class DiagnosisHistoryView(APIView):
     def get(self, request):
@@ -32,23 +41,27 @@ class DiagnosisHistoryView(APIView):
                     
                     # Disease 테이블에서 symptom과 cure를 가져와서 응답 데이터에 추가
                     response_data.append({
+                        "seq": symptom.seq,
+                        "pet": symptom.pet,
+                        "part": symptom.part,
+                        "photo": symptom.photo,
                         "disease": disease_instance.disease,
                         "symptom": disease_instance.symptom,
-                        "cure": disease_instance.cure,
-                        "photo": symptom.photo,  # 각 진단 내역에 대해 사진 경로도 추가
-                        "part": symptom.part,  # 각 진단 내역에 대해 부위도 추가
-                        "pet": symptom.pet,
-                        "seq": symptom.seq
+                        "cure": disease_instance.cure
                     })
             
             # 결과 반환
             return Response(response_data, status=status.HTTP_200_OK)
         
         except SymptomDescription.DoesNotExist:
-            return Response({"error": "No history found for this user."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f"No history found for '{user_id}'."}, status=status.HTTP_404_NOT_FOUND)
 
 
-class SymptomDescriptionViewSet(APIView):
+class DiagnosisView(APIView):
+    def get(self, request, *args, **kwargs):
+        return render(request=request, template_name=os.path.join(TEMPLATE_ROOT, 'diagnosis/diagnosis_request.html'))
+        # return Response("result", status=status.HTTP_200_OK)
+    
     def post(self, request, *args, **kwargs):
         # 요청 데이터에서 owner, pet, photo 정보 가져오기
         owner = request.data.get('owner')
@@ -128,17 +141,10 @@ class SymptomDescriptionViewSet(APIView):
                     "probability": probability  # 확률 추가
                 })
 
-        return Response({
-            "message": "예측이 성공적으로 완료되었고 결과가 저장되었습니다.",
-            "predictions": prediction_results,
-            "diagnoses": response_data  # 상위 2개의 질환과 확률 정보 포함
-        }, status=status.HTTP_200_OK)
+        return render(request=request, template_name="../templates/diagnosis_result.html", context=response_data)
 
-
-class DiseaseViewSet(viewsets.ModelViewSet):
-    queryset = Disease.objects.all()
-    serializer_class = DiseaseSerializer
-
-class DiagnosisViewSet(viewsets.ModelViewSet):
-    queryset = Diagnosis.objects.all()
-    serializer_class = DiagnosisSerializer
+        # return Response({
+        #     "message": "예측이 성공적으로 완료되었고 결과가 저장되었습니다.",
+        #     "predictions": prediction_results,
+        #     "diagnoses": response_data  # 상위 2개의 질환과 확률 정보 포함
+        # }, status=status.HTTP_200_OK)

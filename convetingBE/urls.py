@@ -1,14 +1,13 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import DiagnosisHistoryView, SymptomDescriptionViewSet, DiseaseViewSet, DiagnosisViewSet
+from .views import home, DiagnosisHistoryView, DiagnosisView
 
 router = DefaultRouter()
-# router.register('symptoms', SymptomDescriptionViewSet)
-# router.register('diseases', DiseaseViewSet)
-# router.register('diagnosis', DiagnosisViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('diagnosis/history/', DiagnosisHistoryView.as_view(), name='diagnosis-history'),  # 추가된 라우팅
-    path('diagnosis/description/', SymptomDescriptionViewSet.as_view(), name='symptom-description')
+    path('home', home, name='home'),
+    path('diagnosis/', DiagnosisView.as_view(), name='diagnosis'),
+    # path('diagnosis/result', DiagnosisView.as_view(), name='diagnosis-result'),
+    path('diagnosis/history/', DiagnosisHistoryView.as_view(), name='diagnosis-history')
 ]
