@@ -9,24 +9,26 @@ model_path = './ai_weights'
 
 # 안구 질환별 모델 파일 경로
 eye_model_paths = {
-    '결막염': 'E0_resnet_model.keras',
-    '궤양성 각막질환': 'E1_resnet_model.keras',
-    '백내장': 'E2_resnet_model.keras',
-    '비궤양성 각막질환': 'E3_resnet_model.keras',
-    '색소침착성각막염': 'E4_resnet_model.keras',
-    '안검 내반증': 'E5_resnet_model.keras',
-    '안검종양': 'E7_resnet_model.keras',
-    '유루증': 'E8_resnet_model.keras'
+    'e1': 'E1_CNN_model.keras',
+    'e2': 'E2_CNN_model.keras',
+    'e3': 'E3_CNN_model.keras',
+    'e4': 'E4_CNN_model.keras',
+    'e5': 'E5_CNN_model.keras',
+    'e6': 'E6_CNN_model.keras',
+    'e7': 'E7_CNN_model.keras',
+    'e8': 'E8_CNN_model.keras',
+    'e9': 'E9_CNN_model.keras',
+    'e10': 'E10_CNN_model.keras'
 }
 
 # 피부 질환별 모델 파일 경로
 skin_model_paths = {
-    '구진, 플라크': 'A1_cnn_model.keras',
-    '비듬, 각질, 상피성잔고리': 'A2_cnn_model.keras',
-    '태선화, 과다색소침착': 'A3_cnn_model.keras',
-    '농포, 여드름': 'A4_cnn_model.keras',
-    '미란, 궤양': 'A5_cnn_model.keras',
-    '결절, 종괴': 'A6_cnn_model.keras'
+    's1': 'A1_cnn_model.keras',
+    's2': 'A2_cnn_model.keras',
+    's3': 'A3_cnn_model.keras',
+    's4': 'A4_cnn_model.keras',
+    's5': 'A5_cnn_model.keras',
+    's6': 'A6_cnn_model.keras'
 }
 
 # 모델 로드 (서버 시작 시 한 번만 로드)

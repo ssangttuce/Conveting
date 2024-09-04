@@ -1,22 +1,23 @@
 import os
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.shortcuts import render
 from rest_framework import status 
 from django.conf import settings
 from django.db import models
 from .models import Prediction, Diagnosis, Disease, SymptomDescription
-from .serializers import SymptomDescriptionSerializer, DiseaseSerializer, DiagnosisSerializer
 from .utils import run_diagnosis  # 예측 함수를 임포트
 from django.shortcuts import render
 from pathlib import Path
 import os
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_ROOT = os.path.join(BASE_DIR, 'templates')
+DIAGNOSIS_DIR = os.path.join(TEMPLATE_ROOT, 'diagnosis')
 
 def home(request):
-    return render(request, '../templates/home.html')
+    return render(request, os.path.join(TEMPLATE_ROOT, 'home.html'))
 
 class DiagnosisHistoryView(APIView):
     def get(self, request):
@@ -59,7 +60,7 @@ class DiagnosisHistoryView(APIView):
 
 class DiagnosisView(APIView):
     def get(self, request, *args, **kwargs):
-        return render(request=request, template_name=os.path.join(TEMPLATE_ROOT, 'diagnosis/diagnosis_request.html'))
+        return render(request=request, template_name=os.path.join(DIAGNOSIS_DIR, 'submittal.html'))
         # return Response("result", status=status.HTTP_200_OK)
     
     def post(self, request, *args, **kwargs):
@@ -74,9 +75,13 @@ class DiagnosisView(APIView):
     
         # 파일 이름과 확장자 분리
         file_name, file_extension = os.path.splitext(photo.name)
+        now_kst = datetime.now(ZoneInfo("Asia/Seoul"))
         
-        photo_name = f"{owner}_{pet}_{file_name}{file_extension}"
-        photo_path = os.path.join(settings.MEDIA_ROOT, 'photos', photo_name)
+        # 날짜와 시간을 문자열로 변환합니다. 형식은 "YYYYMMDD_HHMMSS"입니다.
+        timestamp = now_kst.strftime("%Y%m%d_%H%M%S")
+
+        photo_name = f"{timestamp}_{owner}_{pet}_{part}{file_extension}"
+        photo_path = os.path.join(settings.MEDIA_URL, 'photos', photo_name)
 
         # 디렉토리가 없으면 생성
         os.makedirs(os.path.dirname(photo_path), exist_ok=True)
@@ -108,22 +113,24 @@ class DiagnosisView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         # Prediction 모델에 예측 결과 저장
-        prediction = Prediction.objects.create(
+        Prediction.objects.create(
             seq=symptom_description,
-            skin1=prediction_results.get('구진, 플라크', 0),
-            skin2=prediction_results.get('비듬, 각질, 상피성잔고리', 0),
-            skin3=prediction_results.get('태선화, 과다색소침착', 0),
-            skin4=prediction_results.get('농포, 여드름', 0),
-            skin5=prediction_results.get('미란, 궤양', 0),
-            skin6=prediction_results.get('결절, 종괴', 0),
-            eye1=prediction_results.get('결막염', 0),
-            eye2=prediction_results.get('궤양성 각막질환', 0),
-            eye3=prediction_results.get('백내장', 0),
-            eye4=prediction_results.get('비궤양성 각막질환', 0),
-            eye5=prediction_results.get('색소침착성각막염', 0),
-            eye6=prediction_results.get('안검 내반증', 0),
-            eye7=prediction_results.get('안검종양', 0),
-            eye8=prediction_results.get('유루증', 0),
+            skin1=prediction_results.get('s1', 0),
+            skin2=prediction_results.get('s2', 0),
+            skin3=prediction_results.get('s3', 0),
+            skin4=prediction_results.get('s4', 0),
+            skin5=prediction_results.get('s5', 0),
+            skin6=prediction_results.get('s6', 0),
+            eye1=prediction_results.get('e1', 0),
+            eye2=prediction_results.get('e2', 0),
+            eye3=prediction_results.get('e3', 0),
+            eye4=prediction_results.get('e4', 0),
+            eye5=prediction_results.get('e5', 0),
+            eye6=prediction_results.get('e6', 0),
+            eye7=prediction_results.get('e7', 0),
+            eye8=prediction_results.get('e8', 0),
+            eye9=prediction_results.get('e9', 0),
+            eye10=prediction_results.get('e10', 0)
         )
         # 상위 2개의 확률이 높은 질환을 선택
         top_diseases = sorted(prediction_results.items(), key=lambda x: x[1], reverse=True)[:2]
@@ -131,19 +138,19 @@ class DiagnosisView(APIView):
         # 30% 이상 확률의 질환을 Diagnosis 테이블에 저장하고, 상위 2개의 질환을 반환
         response_data = []
         for disease, probability in top_diseases:
-            if probability > 0:  # 확률이 0% 이상인 경우에만 처리
-                disease_instance, _ = Disease.objects.get_or_create(disease=disease)
-                Diagnosis.objects.create(seq=symptom_description, disease=disease_instance)
-                response_data.append({
-                    "disease": disease_instance.disease,
-                    "symptom": disease_instance.symptom,
-                    "cure": disease_instance.cure,
-                    "probability": probability  # 확률 추가
-                })
+            print(disease)
+            disease_instance, _ = Disease.objects.get_or_create(code=disease)
+            Diagnosis.objects.create(seq=symptom_description, disease=disease_instance)
+            response_data.append({
+                "disease": disease_instance.name,
+                "symptom": disease_instance.symptom,
+                "cure": disease_instance.cure,
+                "probability": probability  # 확률 추가
+            })
 
-        cont = {"results": response_data}
-        print("###CONTEXT###", cont)
-        return render(request=request, template_name=os.path.join(TEMPLATE_ROOT, 'diagnosis/diagnosis_result.html'), context=cont)
+        context = {"results": response_data,
+                   "photo": photo_path}
+        return render(request=request, template_name=os.path.join(DIAGNOSIS_DIR, 'result.html'), context=context)
 
         # return Response({
         #     "message": "예측이 성공적으로 완료되었고 결과가 저장되었습니다.",

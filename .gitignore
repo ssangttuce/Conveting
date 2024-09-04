@@ -26,3 +26,5 @@ venv/
 populate_data.py
 
 ai_weights/
+
+media/*

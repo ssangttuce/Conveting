@@ -2,6 +2,8 @@
 {% block title %}Diagnosis Results{% endblock %}
 {% block content %}
     <h2>Diagnosis Results</h2>
+    <!-- <img src="{{ photo }}" height=500px width=500px alt="asd" /> -->
+    <img src="/media/photos/안구.jpeg" height=500px width=500px alt="asd" />
     {% for result in results %}
         <li>
             <strong>Disease:</strong> {{ result.disease }}

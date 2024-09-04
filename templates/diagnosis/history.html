@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Diagnosis History{% endblock %}
+{%
+block content %}
+<h2>Diagnosis History</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Pet Name</th>
+            <th>Part</th>
+            <th>Photo</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for diagnosis in diagnosis_history %}
+            <tr>
+                <td>{{ diagnosis.pet }}</td>
+                <td>{{ diagnosis.part }}</td>
+                <td>
+                    <img src="{{ diagnosis.photo.url }}"
+                         height="500px"
+                         width="500px"
+                         alt="Diagnosis Photo" />
+                </td>
+                <td>{{ diagnosis.date }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -5,7 +5,8 @@ class SymptomDescription(models.Model):
     owner = models.CharField(max_length=30)
     pet = models.CharField(max_length=20)
     part = models.CharField(max_length=20)
-    photo = models.CharField(max_length=255)
+    # photo = models.CharField(max_length=255)
+    photo = models.ImageField(upload_to='photos/')
     
     class Meta:
         db_table = 'symptomdescription'
@@ -26,12 +27,15 @@ class Prediction(models.Model):
     eye6 = models.DecimalField(max_digits=5, decimal_places=2)
     eye7 = models.DecimalField(max_digits=5, decimal_places=2)
     eye8 = models.DecimalField(max_digits=5, decimal_places=2)
+    eye9 = models.DecimalField(max_digits=5, decimal_places=2)
+    eye10 = models.DecimalField(max_digits=5, decimal_places=2)
     
     class Meta:
         db_table = 'prediction'
     
 class Disease(models.Model):
-    disease = models.CharField(max_length=255, primary_key=True, db_column='disease')
+    code = models.CharField(max_length=10, primary_key=True, db_column='code')
+    name = models.CharField(max_length=255, db_column='name')
     symptom = models.TextField(max_length=500)
     cure = models.TextField(max_length=500, default='Nothing')
     
