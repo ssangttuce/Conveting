@@ -2,15 +2,12 @@ import os
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status 
-from django.conf import settings
 from django.db import models
 from .models import Prediction, Diagnosis, Disease, SymptomDescription
 from .utils import run_diagnosis  # 예측 함수를 임포트
 from django.shortcuts import render
 from pathlib import Path
 import os
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_ROOT = os.path.join(BASE_DIR, 'templates')
@@ -72,24 +69,6 @@ class DiagnosisView(APIView):
 
         if not owner or not pet or not photo:
             return Response({"error": "owner, pet, and photo are required fields."}, status=status.HTTP_400_BAD_REQUEST)
-    
-        # 파일 이름과 확장자 분리
-        file_name, file_extension = os.path.splitext(photo.name)
-        now_kst = datetime.now(ZoneInfo("Asia/Seoul"))
-        
-        # 날짜와 시간을 문자열로 변환합니다. 형식은 "YYYYMMDD_HHMMSS"입니다.
-        timestamp = now_kst.strftime("%Y%m%d_%H%M%S")
-
-        photo_name = f"{timestamp}_{owner}_{pet}_{part}{file_extension}"
-        photo_path = os.path.join(settings.MEDIA_URL, 'photos', photo_name)
-
-        # 디렉토리가 없으면 생성
-        os.makedirs(os.path.dirname(photo_path), exist_ok=True)
-
-        # 파일 저장
-        with open(photo_path, 'wb+') as destination:
-            for chunk in photo.chunks():
-                destination.write(chunk)
         
         # 가장 큰 seq 번호를 조회하여 다음 seq 번호 생성
         max_seq = SymptomDescription.objects.all().aggregate(models.Max('seq'))['seq__max'] or 0
@@ -97,15 +76,15 @@ class DiagnosisView(APIView):
         
         # SymptomDescription 모델에 데이터 저장
         symptom_description = SymptomDescription.objects.create(
-            seq=new_seq,  # 생성한 seq 번호를 저장
+            seq=new_seq,
             owner=owner,
             pet=pet,
             part=part,
-            photo=photo_path
+            photo=photo
         )
-
-        # AI 모델에 사진 경로를 전달하고 진단을 수행
-        # 예시: AI 모델 호출 (여기서는 가상의 함수로 표시)
+        
+        photo_path = os.path.join(BASE_DIR, symptom_description.photo.path)
+        
         # 모델 예측 수행
         try:
             prediction_results = run_diagnosis(photo_path, part)
@@ -132,13 +111,13 @@ class DiagnosisView(APIView):
             eye9=prediction_results.get('e9', 0),
             eye10=prediction_results.get('e10', 0)
         )
+        
         # 상위 2개의 확률이 높은 질환을 선택
         top_diseases = sorted(prediction_results.items(), key=lambda x: x[1], reverse=True)[:2]
 
-        # 30% 이상 확률의 질환을 Diagnosis 테이블에 저장하고, 상위 2개의 질환을 반환
+        # 상위 2개의 질환을 반환
         response_data = []
         for disease, probability in top_diseases:
-            print(disease)
             disease_instance, _ = Disease.objects.get_or_create(code=disease)
             Diagnosis.objects.create(seq=symptom_description, disease=disease_instance)
             response_data.append({
@@ -149,11 +128,5 @@ class DiagnosisView(APIView):
             })
 
         context = {"results": response_data,
-                   "photo": photo_path}
+                   "photo": symptom_description.photo.url}
         return render(request=request, template_name=os.path.join(DIAGNOSIS_DIR, 'result.html'), context=context)
-
-        # return Response({
-        #     "message": "예측이 성공적으로 완료되었고 결과가 저장되었습니다.",
-        #     "predictions": prediction_results,
-        #     "diagnoses": response_data  # 상위 2개의 질환과 확률 정보 포함
-        # }, status=status.HTTP_200_OK)
