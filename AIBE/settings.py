@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     # "django.contrib.staticfiles",
     'corsheaders',
     'rest_framework',
+    'rest_framework.authtoken',
     "convetingBE"
 ]
 
@@ -48,7 +49,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication'
+    ],
     'DEFAULT_PERMISSION_CLASSES': [],
 }
 
