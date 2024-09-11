@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status 
 from django.db import models
 from .models import Prediction, Diagnosis, Disease, SymptomDescription
+from .serializers import SymptomDescriptionSerializer, DiagnosisSerializer
 from .utils import run_diagnosis  # 예측 함수를 임포트
 from django.shortcuts import render
 from pathlib import Path
@@ -20,40 +21,23 @@ class DiagnosisHistoryView(APIView):
     def get(self, request):
         user_id = request.query_params.get('user_id')
         try:
-            # SymptomDescription 테이블에서 해당 user_id(owner)로 필터링
             symptoms = SymptomDescription.objects.filter(owner=user_id)
             
             if not symptoms.exists():
                 return Response({"error": "No history found for this user."}, status=status.HTTP_404_NOT_FOUND)
-            
-            # 진단 내역을 담을 리스트
+
             response_data = []
-
             for symptom in symptoms:
-                # SymptomDescription의 seq를 이용하여 Diagnosis 테이블에서 해당 진단 내역 조회
                 diagnosis_list = Diagnosis.objects.filter(seq=symptom)
-
-                # 해당 진단에 대해 직렬화 및 추가 정보 구성
-                for diagnosis in diagnosis_list:
-                    disease_instance = diagnosis.disease
-                    
-                    # Disease 테이블에서 symptom과 cure를 가져와서 응답 데이터에 추가
-                    response_data.append({
-                        "seq": symptom.seq,
-                        "pet": symptom.pet,
-                        "part": symptom.part,
-                        "photo": symptom.photo,
-                        "disease": disease_instance.disease,
-                        "symptom": disease_instance.symptom,
-                        "cure": disease_instance.cure
-                    })
+                response_data.append({
+                    "symptom": SymptomDescriptionSerializer(symptom).data,
+                    "diagnoses": DiagnosisSerializer(diagnosis_list, many=True).data
+                })
             
-            # 결과 반환
             return Response(response_data, status=status.HTTP_200_OK)
         
         except SymptomDescription.DoesNotExist:
             return Response({"error": f"No history found for '{user_id}'."}, status=status.HTTP_404_NOT_FOUND)
-
 
 class DiagnosisView(APIView):
     def get(self, request, *args, **kwargs):
@@ -118,15 +102,17 @@ class DiagnosisView(APIView):
         # 상위 2개의 질환을 반환
         response_data = []
         for disease, probability in top_diseases:
-            disease_instance, _ = Disease.objects.get_or_create(code=disease)
+            disease_instance, _ = Disease.objects.get_or_create(code=disease) # 인스턴스, 새로 생성 여부
             Diagnosis.objects.create(seq=symptom_description, disease=disease_instance)
             response_data.append({
                 "disease": disease_instance.name,
                 "symptom": disease_instance.symptom,
                 "cure": disease_instance.cure,
-                "probability": probability  # 확률 추가
+                "probability": probability
             })
 
-        context = {"results": response_data,
-                   "photo": symptom_description.photo.url}
+        context = {
+            "results": response_data,
+            "photo": symptom_description.photo.url
+        }
         return render(request=request, template_name=os.path.join(DIAGNOSIS_DIR, 'result.html'), context=context)
