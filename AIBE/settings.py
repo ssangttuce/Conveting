@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     # "django.contrib.staticfiles",
     'corsheaders',
     'rest_framework',
-    "convetingBE"
+    "diagnosis"
 ]
 
 MEDIA_URL = '/media/'
